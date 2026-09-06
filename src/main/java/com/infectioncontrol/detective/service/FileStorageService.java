@@ -14,16 +14,19 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
-public class FileStorageService {
+public class FileStorageService implements StorageService {
 
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of("jpg", "jpeg", "png", "gif", "webp", "svg");
 
     private final Path uploadDir;
+    private final String publicBaseUrl;
 
     public FileStorageService(AppProperties appProperties) {
         this.uploadDir = appProperties.getUploadDir().toAbsolutePath().normalize();
+        this.publicBaseUrl = normalizeBaseUrl(appProperties.getPublicBaseUrl());
     }
 
+    @Override
     public String storeImage(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("이미지 파일을 업로드해주세요.");
@@ -52,11 +55,31 @@ public class FileStorageService {
         }
     }
 
+    @Override
+    public String resolvePublicUrl(String storedUrl) {
+        if (storedUrl == null || storedUrl.isBlank() || isAbsoluteUrl(storedUrl) || publicBaseUrl.isBlank()) {
+            return storedUrl;
+        }
+        return publicBaseUrl + (storedUrl.startsWith("/") ? storedUrl : "/" + storedUrl);
+    }
+
     private String extensionOf(String filename) {
         int dotIndex = filename.lastIndexOf('.');
         if (dotIndex < 0 || dotIndex == filename.length() - 1) {
             return "png";
         }
         return filename.substring(dotIndex + 1).toLowerCase(Locale.ROOT);
+    }
+
+    private String normalizeBaseUrl(String baseUrl) {
+        if (baseUrl == null || baseUrl.isBlank()) {
+            return "";
+        }
+        String trimmed = baseUrl.trim();
+        return trimmed.endsWith("/") ? trimmed.substring(0, trimmed.length() - 1) : trimmed;
+    }
+
+    private boolean isAbsoluteUrl(String url) {
+        return url.startsWith("http://") || url.startsWith("https://");
     }
 }

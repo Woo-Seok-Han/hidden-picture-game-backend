@@ -11,11 +11,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class QuestionMapper {
 
+    private final StorageService storageService;
+
+    public QuestionMapper(StorageService storageService) {
+        this.storageService = storageService;
+    }
+
     public QuestionSummaryResponse toSummary(Question question) {
         return new QuestionSummaryResponse(
                 question.getId(),
                 question.getQuestionNumber(),
-                question.getImageUrl(),
+                storageService.resolvePublicUrl(question.getImageUrl()),
                 question.getImageAlt(),
                 question.getTimeLimitSeconds()
         );
@@ -25,7 +31,7 @@ public class QuestionMapper {
         return new AdminQuestionResponse(
                 question.getId(),
                 question.getQuestionNumber(),
-                question.getImageUrl(),
+                storageService.resolvePublicUrl(question.getImageUrl()),
                 question.getImageAlt(),
                 question.getExplanation(),
                 question.getTimeLimitSeconds(),

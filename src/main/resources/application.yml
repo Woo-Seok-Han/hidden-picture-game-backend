@@ -27,6 +27,7 @@ spring:
 
 app:
   upload-dir: uploads
+  public-base-url: ${APP_PUBLIC_BASE_URL:}
   cors:
     allowed-origins:
       - http://localhost:5173

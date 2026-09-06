@@ -18,6 +18,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class GameResultMapper {
 
+    private final StorageService storageService;
+
+    public GameResultMapper(StorageService storageService) {
+        this.storageService = storageService;
+    }
+
     public GameResultResponse toResult(GameSession session, int totalQuestions) {
         List<AnswerResponse> answers = toAnswerResponses(session.getAnswers());
         int correctAnswers = (int) session.getAnswers().stream().filter(GameAnswer::isCorrect).count();
@@ -61,7 +67,7 @@ public class GameResultMapper {
                 answer.getQuestionId(),
                 answer.getQuestionNumber() == null ? 0 : answer.getQuestionNumber(),
                 question == null ? "문제" : "문제 " + question.getQuestionNumber(),
-                question == null ? "" : question.getImageUrl(),
+                question == null ? "" : storageService.resolvePublicUrl(question.getImageUrl()),
                 userAnswer,
                 correctAnswer,
                 answer.isCorrect(),

@@ -16,6 +16,17 @@ http://localhost:3000
 
 프론트엔드 기본 API 주소와 맞추기 위해 API prefix는 `/api`를 사용합니다.
 
+## 이미지 URL
+
+관리자에서 업로드한 이미지는 기본적으로 로컬 `uploads/` 디렉터리에 저장되고 `/uploads/{filename}` 경로로 서빙됩니다.
+배포 환경에서는 프론트엔드가 `localhost`를 참조하지 않도록 백엔드 공개 주소를 환경 변수로 지정해주세요.
+
+```bash
+APP_PUBLIC_BASE_URL=https://your-backend.example.com ./gradlew bootRun
+```
+
+설정하지 않으면 API 응답에는 `/uploads/...`, `/sample/...` 같은 상대 경로가 내려갑니다.
+
 ## H2 Console
 
 ```text

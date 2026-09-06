@@ -9,6 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class AppProperties {
 
     private Path uploadDir = Path.of("uploads");
+    private String publicBaseUrl = "";
     private Cors cors = new Cors();
 
     public Path getUploadDir() {
@@ -17,6 +18,14 @@ public class AppProperties {
 
     public void setUploadDir(Path uploadDir) {
         this.uploadDir = uploadDir;
+    }
+
+    public String getPublicBaseUrl() {
+        return publicBaseUrl;
+    }
+
+    public void setPublicBaseUrl(String publicBaseUrl) {
+        this.publicBaseUrl = publicBaseUrl;
     }
 
     public Cors getCors() {

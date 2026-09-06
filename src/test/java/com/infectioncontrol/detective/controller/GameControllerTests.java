@@ -35,6 +35,7 @@ class GameControllerTests {
         mockMvc.perform(get("/api/game/questions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(5)))
-                .andExpect(jsonPath("$[0].id").value("q1"));
+                .andExpect(jsonPath("$[0].id").value("q1"))
+                .andExpect(jsonPath("$[0].imageUrl").value("http://test-api.example.com/sample/questions/q1.svg"));
     }
 }
