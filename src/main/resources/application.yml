@@ -1,0 +1,36 @@
+server:
+  port: 3000
+
+spring:
+  application:
+    name: hidden-picture-game-backend
+  datasource:
+    url: jdbc:h2:file:./data/infection-control-detective
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 1234
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 12MB
+
+app:
+  upload-dir: uploads
+  cors:
+    allowed-origins:
+      - http://localhost:5173
+      - http://localhost:5174
+      - http://127.0.0.1:5173
+      - http://127.0.0.1:5174
+      - http://localhost:3000
