@@ -18,9 +18,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class GameResultMapper {
 
+    private final QuestionMapper questionMapper;
     private final StorageService storageService;
 
-    public GameResultMapper(StorageService storageService) {
+    public GameResultMapper(QuestionMapper questionMapper, StorageService storageService) {
+        this.questionMapper = questionMapper;
         this.storageService = storageService;
     }
 
@@ -40,7 +42,7 @@ public class GameResultMapper {
     }
 
     public DetailedGameResultResponse toDetailedResult(GameSession session, List<Question> questions) {
-        GameResultResponse result = toResult(session, questions.size());
+        GameResultResponse result = toResult(session, session.getAnswers().size());
         Map<String, Question> questionById = questions.stream()
                 .collect(Collectors.toMap(Question::getId, Function.identity()));
         List<QuestionDetailResponse> details = session.getAnswers().stream()
@@ -72,7 +74,8 @@ public class GameResultMapper {
                 correctAnswer,
                 answer.isCorrect(),
                 question == null ? "" : question.getExplanation(),
-                toSelectedPoint(answer)
+                toSelectedPoint(answer),
+                question == null ? List.of() : questionMapper.toErrorAreaDtos(question.getErrorAreas())
         );
     }
 

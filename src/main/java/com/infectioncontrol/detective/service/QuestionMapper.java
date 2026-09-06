@@ -35,6 +35,7 @@ public class QuestionMapper {
                 question.getImageAlt(),
                 question.getExplanation(),
                 question.getTimeLimitSeconds(),
+                question.isActive(),
                 toErrorAreaDtos(question.getErrorAreas()),
                 question.getCreatedAt(),
                 question.getUpdatedAt()

@@ -18,14 +18,47 @@ http://localhost:3000
 
 ## 이미지 URL
 
-관리자에서 업로드한 이미지는 기본적으로 로컬 `uploads/` 디렉터리에 저장되고 `/uploads/{filename}` 경로로 서빙됩니다.
+관리자에서 업로드한 이미지는 로컬 개발에서는 `uploads/` 폴더에 저장되고 `/uploads/{filename}` 경로로 서빙됩니다.
 배포 환경에서는 프론트엔드가 `localhost`를 참조하지 않도록 백엔드 공개 주소를 환경 변수로 지정해주세요.
 
 ```bash
 APP_PUBLIC_BASE_URL=https://your-backend.example.com ./gradlew bootRun
 ```
 
-설정하지 않으면 API 응답에는 `/uploads/...`, `/sample/...` 같은 상대 경로가 내려갑니다.
+설정하지 않으면 API 응답에는 `/uploads/...` 같은 상대 경로가 내려갑니다.
+
+## Render + Cloudflare R2 배포
+
+Render에서는 Dockerfile 기반 Web Service로 배포합니다.
+H2 파일 DB는 Render 인스턴스의 임시 파일 시스템을 사용하고, 관리자 업로드 이미지는 Cloudflare R2에 저장합니다.
+
+Render 환경 변수:
+
+```text
+PORT=3000
+SPRING_DATASOURCE_URL=jdbc:h2:file:./data/infection-control-detective
+SPRING_DATASOURCE_USERNAME=sa
+SPRING_DATASOURCE_PASSWORD=원하는비밀번호
+APP_PUBLIC_BASE_URL=https://your-backend.onrender.com
+APP_CORS_ALLOWED_ORIGINS=https://your-frontend.vercel.app,http://localhost:5173
+
+APP_STORAGE_TYPE=r2
+R2_ENDPOINT=https://ACCOUNT_ID.r2.cloudflarestorage.com
+R2_BUCKET=hidden-picture-game
+R2_REGION=auto
+R2_ACCESS_KEY_ID=...
+R2_SECRET_ACCESS_KEY=...
+R2_PUBLIC_BASE_URL=https://your-public-r2-domain
+```
+
+Vercel 프론트엔드 환경 변수:
+
+```text
+VITE_API_URL=https://your-backend.onrender.com/api
+VITE_API_ASSET_URL=https://your-public-r2-domain
+```
+
+로컬 개발에서는 `APP_STORAGE_TYPE`을 설정하지 않으면 기존처럼 `uploads/` 폴더에 저장됩니다.
 
 ## H2 Console
 
@@ -42,14 +75,17 @@ http://localhost:3000/h2-console
 - `POST /api/user/validate`
 - `GET /api/user/{employeeNumber}/results`
 - `POST /api/game/start`
-- `GET /api/game/questions`
+- `GET /api/game/questions` - 활성 문제 중 랜덤 5문제 반환
 - `POST /api/game/submit`
 - `POST /api/game/complete`
 - `GET /api/admin/questions`
 - `POST /api/admin/questions`
 - `PUT /api/admin/questions/{id}`
+- `PATCH /api/admin/questions/{id}/active?active=true`
 - `DELETE /api/admin/questions/{id}`
 - `GET /api/admin/results`
+
+게임 시작 시 활성 문제가 5개 미만이면 시작할 수 없습니다. 관리자는 문제를 계속 업로드할 수 있고, 문제 관리 화면에서 출제 여부를 활성/비활성으로 바꿀 수 있습니다.
 
 ## 관리자 문제 이미지 업로드 예시
 

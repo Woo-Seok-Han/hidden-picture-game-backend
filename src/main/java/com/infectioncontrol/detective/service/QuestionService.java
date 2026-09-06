@@ -9,6 +9,8 @@ import com.infectioncontrol.detective.dto.ErrorAreaDto;
 import com.infectioncontrol.detective.dto.QuestionSummaryResponse;
 import com.infectioncontrol.detective.repository.QuestionRepository;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -19,29 +21,38 @@ public class QuestionService {
 
     private final QuestionRepository questionRepository;
     private final QuestionMapper questionMapper;
-    private final FileStorageService fileStorageService;
+    private final StorageService storageService;
     private final ObjectMapper objectMapper;
 
     public QuestionService(
             QuestionRepository questionRepository,
             QuestionMapper questionMapper,
-            FileStorageService fileStorageService,
+            StorageService storageService,
             ObjectMapper objectMapper
     ) {
         this.questionRepository = questionRepository;
         this.questionMapper = questionMapper;
-        this.fileStorageService = fileStorageService;
+        this.storageService = storageService;
         this.objectMapper = objectMapper;
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<QuestionSummaryResponse> getPlayableQuestions() {
-        return questionRepository.findByActiveTrueOrderByQuestionNumberAsc().stream()
+        List<Question> activeQuestions = new ArrayList<>(questionRepository.findByActiveTrueOrderByQuestionNumberAsc());
+        if (activeQuestions.size() < 5) {
+            throw new IllegalArgumentException("출제 가능한 문제가 5개 이상 필요합니다.");
+        }
+
+        Collections.shuffle(activeQuestions);
+        return activeQuestions.stream()
+                .limit(5)
                 .map(questionMapper::toSummary)
                 .toList();
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<AdminQuestionResponse> getAdminQuestions() {
-        return questionRepository.findByActiveTrueOrderByQuestionNumberAsc().stream()
+        return questionRepository.findAllByOrderByQuestionNumberAsc().stream()
                 .map(questionMapper::toAdminResponse)
                 .toList();
     }
@@ -54,8 +65,8 @@ public class QuestionService {
             int timeLimitSeconds,
             String errorAreasJson
     ) {
-        String imageUrl = fileStorageService.storeImage(image);
-        int nextQuestionNumber = questionRepository.countByActiveTrue() + 1;
+        String imageUrl = storageService.storeImage(image);
+        int nextQuestionNumber = nextQuestionNumber();
         Question question = new Question(
                 UUID.randomUUID().toString(),
                 nextQuestionNumber,
@@ -79,7 +90,7 @@ public class QuestionService {
     ) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
-        String imageUrl = image == null || image.isEmpty() ? null : fileStorageService.storeImage(image);
+        String imageUrl = image == null || image.isEmpty() ? null : storageService.storeImage(image);
         question.update(
                 imageUrl,
                 defaultText(imageAlt, question.getImageAlt()),
@@ -96,6 +107,14 @@ public class QuestionService {
             throw new IllegalArgumentException("문제를 찾을 수 없습니다.");
         }
         questionRepository.deleteById(id);
+    }
+
+    @Transactional
+    public AdminQuestionResponse changeActive(String id, boolean active) {
+        Question question = questionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
+        question.changeActive(active);
+        return questionMapper.toAdminResponse(question);
     }
 
     private List<ErrorArea> parseErrorAreas(String errorAreasJson) {
@@ -122,5 +141,12 @@ public class QuestionService {
             return 30;
         }
         return Math.max(5, Math.min(300, seconds));
+    }
+
+    private int nextQuestionNumber() {
+        return questionRepository.findAll().stream()
+                .mapToInt(Question::getQuestionNumber)
+                .max()
+                .orElse(0) + 1;
     }
 }

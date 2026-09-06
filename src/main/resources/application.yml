@@ -1,14 +1,14 @@
 server:
-  port: 3000
+  port: ${PORT:3000}
 
 spring:
   application:
     name: hidden-picture-game-backend
   datasource:
-    url: jdbc:h2:file:./data/infection-control-detective
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:file:./data/infection-control-detective}
     driver-class-name: org.h2.Driver
-    username: sa
-    password: 1234
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:1234}
   h2:
     console:
       enabled: true
@@ -26,12 +26,16 @@ spring:
       max-request-size: 12MB
 
 app:
-  upload-dir: uploads
+  upload-dir: ${APP_UPLOAD_DIR:uploads}
   public-base-url: ${APP_PUBLIC_BASE_URL:}
+  storage:
+    type: ${APP_STORAGE_TYPE:local}
+    r2:
+      endpoint: ${R2_ENDPOINT:}
+      bucket: ${R2_BUCKET:}
+      region: ${R2_REGION:auto}
+      access-key-id: ${R2_ACCESS_KEY_ID:}
+      secret-access-key: ${R2_SECRET_ACCESS_KEY:}
+      public-base-url: ${R2_PUBLIC_BASE_URL:}
   cors:
-    allowed-origins:
-      - http://localhost:5173
-      - http://localhost:5174
-      - http://127.0.0.1:5173
-      - http://127.0.0.1:5174
-      - http://localhost:3000
+    allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174,http://localhost:3000}

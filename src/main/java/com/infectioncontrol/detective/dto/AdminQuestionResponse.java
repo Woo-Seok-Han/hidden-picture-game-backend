@@ -10,6 +10,7 @@ public record AdminQuestionResponse(
         String imageAlt,
         String explanation,
         int timeLimitSeconds,
+        boolean active,
         List<ErrorAreaDto> errorAreas,
         Instant createdAt,
         Instant updatedAt

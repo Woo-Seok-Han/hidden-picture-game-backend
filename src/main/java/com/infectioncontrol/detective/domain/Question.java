@@ -68,6 +68,11 @@ public class Question {
         newErrorAreas.forEach(this::addErrorArea);
     }
 
+    public void changeActive(boolean active) {
+        this.active = active;
+        this.updatedAt = Instant.now();
+    }
+
     public void addErrorArea(ErrorArea area) {
         area.attachTo(this);
         this.errorAreas.add(area);

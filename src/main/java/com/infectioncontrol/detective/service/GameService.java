@@ -39,6 +39,9 @@ public class GameService {
 
     @Transactional
     public GameStartResponse start(String employeeNumber) {
+        if (questionRepository.countByActiveTrue() < 5) {
+            throw new IllegalArgumentException("게임을 시작하려면 활성 문제가 5개 이상 필요합니다.");
+        }
         GameSession session = gameSessionRepository.save(new GameSession(employeeNumber.trim()));
         return new GameStartResponse(session.getId(), session.getEmployeeNumber(), session.getStartTime());
     }
@@ -55,7 +58,7 @@ public class GameService {
                 .toList();
 
         session.complete(scoredAnswers);
-        return gameResultMapper.toResult(session, questions.size());
+        return gameResultMapper.toResult(session, scoredAnswers.size());
     }
 
     @Transactional
@@ -73,12 +76,12 @@ public class GameService {
         GameSession session = gameSessionRepository
                 .findFirstByEmployeeNumberAndStatusOrderByCompletedAtDesc(employeeNumber, GameSessionStatus.COMPLETED)
                 .orElseThrow(() -> new IllegalArgumentException("완료된 게임 결과를 찾을 수 없습니다."));
-        return gameResultMapper.toDetailedResult(session, questionRepository.findByActiveTrueOrderByQuestionNumberAsc());
+        return gameResultMapper.toDetailedResult(session, questionRepository.findAllByOrderByQuestionNumberAsc());
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<DetailedGameResultResponse> getAllResults() {
-        List<Question> questions = questionRepository.findByActiveTrueOrderByQuestionNumberAsc();
+        List<Question> questions = questionRepository.findAllByOrderByQuestionNumberAsc();
         return gameSessionRepository.findByStatusOrderByCompletedAtDesc(GameSessionStatus.COMPLETED).stream()
                 .map(session -> gameResultMapper.toDetailedResult(session, questions))
                 .toList();

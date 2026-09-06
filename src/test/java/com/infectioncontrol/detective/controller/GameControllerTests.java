@@ -1,6 +1,9 @@
 package com.infectioncontrol.detective.controller;
 
 import static org.hamcrest.Matchers.hasSize;
+import com.infectioncontrol.detective.domain.Question;
+import com.infectioncontrol.detective.repository.QuestionRepository;
+import org.junit.jupiter.api.BeforeEach;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -12,13 +15,35 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestPropertySource(properties = {
+        "spring.datasource.url=jdbc:h2:mem:game-controller-test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE"
+})
 class GameControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private QuestionRepository questionRepository;
+
+    @BeforeEach
+    void setUp() {
+        questionRepository.deleteAll();
+        for (int index = 1; index <= 6; index++) {
+            questionRepository.save(new Question(
+                    "test-q" + index,
+                    index,
+                    "/uploads/test-q" + index + ".png",
+                    "테스트 문제 " + index,
+                    "테스트 해설 " + index,
+                    15
+            ));
+        }
+    }
 
     @Test
     void startGameCreatesSession() throws Exception {
@@ -31,11 +56,9 @@ class GameControllerTests {
     }
 
     @Test
-    void questionsReturnsSeededQuestions() throws Exception {
+    void questionsReturnsRandomFiveActiveQuestions() throws Exception {
         mockMvc.perform(get("/api/game/questions"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(5)))
-                .andExpect(jsonPath("$[0].id").value("q1"))
-                .andExpect(jsonPath("$[0].imageUrl").value("http://test-api.example.com/sample/questions/q1.svg"));
+                .andExpect(jsonPath("$", hasSize(5)));
     }
 }

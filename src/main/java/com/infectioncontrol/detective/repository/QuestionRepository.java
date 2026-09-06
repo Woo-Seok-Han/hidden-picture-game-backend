@@ -9,4 +9,6 @@ public interface QuestionRepository extends JpaRepository<Question, String> {
     List<Question> findByActiveTrueOrderByQuestionNumberAsc();
 
     int countByActiveTrue();
+
+    List<Question> findAllByOrderByQuestionNumberAsc();
 }

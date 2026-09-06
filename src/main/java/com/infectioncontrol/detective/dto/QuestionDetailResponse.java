@@ -9,6 +9,7 @@ public record QuestionDetailResponse(
         String correctAnswer,
         boolean isCorrect,
         String explanation,
-        SelectedPointDto selectedPoint
+        SelectedPointDto selectedPoint,
+        java.util.List<ErrorAreaDto> errorAreas
 ) {
 }

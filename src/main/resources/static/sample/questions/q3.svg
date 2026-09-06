@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
-  <rect width="1200" height="760" fill="#f6f1ea"/>
-  <rect x="150" y="130" width="900" height="470" rx="24" fill="#ffffff" stroke="#c8b8a8" stroke-width="6"/>
-  <rect x="250" y="230" width="180" height="230" rx="16" fill="#99c1b9"/>
-  <rect x="510" y="230" width="180" height="230" rx="16" fill="#f2cc8f"/>
-  <rect x="770" y="230" width="180" height="230" rx="16" fill="#e07a5f"/>
-  <circle cx="600" cy="510" r="30" fill="#3d405b"/>
-  <text x="600" y="705" font-family="Arial, sans-serif" font-size="42" text-anchor="middle" fill="#3d405b">Sample Question 3</text>
-</svg>

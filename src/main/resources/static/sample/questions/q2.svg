@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
-  <rect width="1200" height="760" fill="#f2f4f8"/>
-  <rect x="130" y="120" width="940" height="500" rx="22" fill="#ffffff" stroke="#b8c0cc" stroke-width="6"/>
-  <rect x="210" y="190" width="230" height="330" rx="12" fill="#d7ecff"/>
-  <rect x="485" y="190" width="230" height="330" rx="12" fill="#e6f5dd"/>
-  <rect x="760" y="190" width="230" height="330" rx="12" fill="#fff0c9"/>
-  <path d="M285 560h630" stroke="#6d7a8a" stroke-width="18" stroke-linecap="round"/>
-  <text x="600" y="705" font-family="Arial, sans-serif" font-size="42" text-anchor="middle" fill="#2e3a4a">Sample Question 2</text>
-</svg>
