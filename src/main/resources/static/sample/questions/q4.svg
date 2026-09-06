@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
+  <rect width="1200" height="760" fill="#edf7fb"/>
+  <rect x="120" y="110" width="960" height="530" rx="20" fill="#ffffff" stroke="#9ec5d3" stroke-width="6"/>
+  <rect x="230" y="190" width="740" height="90" rx="14" fill="#bad7df"/>
+  <rect x="230" y="340" width="740" height="90" rx="14" fill="#bad7df"/>
+  <rect x="230" y="490" width="740" height="90" rx="14" fill="#bad7df"/>
+  <path d="M940 180l-80 80M860 180l80 80" stroke="#d1495b" stroke-width="20" stroke-linecap="round"/>
+  <text x="600" y="705" font-family="Arial, sans-serif" font-size="42" text-anchor="middle" fill="#235163">Sample Question 4</text>
+</svg>
