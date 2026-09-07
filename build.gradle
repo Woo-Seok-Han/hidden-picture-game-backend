@@ -27,9 +27,10 @@ dependencies {
     implementation platform('software.amazon.awssdk:bom:2.25.70')
     implementation 'software.amazon.awssdk:s3'
 
-    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'org.postgresql:postgresql'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'com.h2database:h2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

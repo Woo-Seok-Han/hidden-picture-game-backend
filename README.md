@@ -1,6 +1,6 @@
 # 감염관리탐정단 Backend
 
-Spring Boot, Gradle, H2 파일 DB 기반 백엔드입니다.
+Spring Boot, Gradle, Supabase PostgreSQL 기반 백엔드입니다. 로컬 실행과 Render 모두 동일한 외부 DB를 사용합니다.
 
 ## 실행
 
@@ -30,14 +30,14 @@ APP_PUBLIC_BASE_URL=https://your-backend.example.com ./gradlew bootRun
 ## Render + Cloudflare R2 배포
 
 Render에서는 Dockerfile 기반 Web Service로 배포합니다.
-H2 파일 DB는 Render 인스턴스의 임시 파일 시스템을 사용하고, 관리자 업로드 이미지는 Cloudflare R2에 저장합니다.
+문제와 참여 기록은 Supabase PostgreSQL에, 관리자 업로드 이미지는 Cloudflare R2에 저장합니다. Render 재배포로 DB 데이터가 삭제되지 않습니다.
 
 Render 환경 변수:
 
 ```text
 PORT=3000
-SPRING_DATASOURCE_URL=jdbc:h2:file:./data/infection-control-detective
-SPRING_DATASOURCE_USERNAME=sa
+SPRING_DATASOURCE_URL=jdbc:postgresql://<SESSION_POOLER_HOST>:5432/postgres?sslmode=require
+SPRING_DATASOURCE_USERNAME=postgres.<PROJECT_REF>
 SPRING_DATASOURCE_PASSWORD=원하는비밀번호
 APP_PUBLIC_BASE_URL=https://your-backend.onrender.com
 APP_CORS_ALLOWED_ORIGINS=https://your-frontend.vercel.app,http://localhost:5173
@@ -60,15 +60,13 @@ VITE_API_ASSET_URL=https://your-public-r2-domain
 
 로컬 개발에서는 `APP_STORAGE_TYPE`을 설정하지 않으면 기존처럼 `uploads/` 폴더에 저장됩니다.
 
-## H2 Console
+## 로컬 DB 설정
 
-```text
-http://localhost:3000/h2-console
-```
+Supabase의 Connect → Session pooler에서 호스트와 사용자 이름을 확인합니다. 위의 SPRING_DATASOURCE_URL, SPRING_DATASOURCE_USERNAME, SPRING_DATASOURCE_PASSWORD를 IDE 실행 환경변수에 설정한 뒤 실행하세요. 비밀번호는 Supabase 프로젝트 생성 시 지정한 DB 비밀번호이며 Git에 저장하지 않습니다. 일반 .env 파일은 Spring Boot가 자동으로 읽지 않습니다.
 
-- JDBC URL: `jdbc:h2:file:./data/infection-control-detective`
-- User Name: `sa`
-- Password: 비워둠
+최초 실행 시 Hibernate ddl-auto=update가 테이블을 생성합니다. 운영 DB에 create/create-drop을 설정하지 마세요. 자동 테스트에서만 격리된 H2 메모리 DB를 사용하며 배포 JAR에는 H2를 포함하지 않습니다.
+
+검증: ./gradlew test bootJar → 배포 로그에서 PostgreSQL 연결 확인 → 문제 등록 → Render 재시작 후 같은 문제 조회 확인.
 
 ## 주요 API
 
