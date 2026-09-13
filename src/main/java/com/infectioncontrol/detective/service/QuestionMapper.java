@@ -23,7 +23,8 @@ public class QuestionMapper {
                 question.getQuestionNumber(),
                 storageService.resolvePublicUrl(question.getImageUrl()),
                 question.getImageAlt(),
-                question.getTimeLimitSeconds()
+                question.getTimeLimitSeconds(),
+                toErrorAreaDtos(question.getErrorAreas())
         );
     }
 

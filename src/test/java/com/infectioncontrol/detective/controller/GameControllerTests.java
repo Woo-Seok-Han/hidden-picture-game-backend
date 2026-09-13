@@ -1,6 +1,7 @@
 package com.infectioncontrol.detective.controller;
 
 import static org.hamcrest.Matchers.hasSize;
+import com.infectioncontrol.detective.domain.ErrorArea;
 import com.infectioncontrol.detective.domain.GameSession;
 import com.infectioncontrol.detective.domain.Question;
 import com.infectioncontrol.detective.repository.GameSessionRepository;
@@ -41,14 +42,16 @@ class GameControllerTests {
         gameSessionRepository.deleteAll();
         questionRepository.deleteAll();
         for (int index = 1; index <= 6; index++) {
-            questionRepository.save(new Question(
+            Question question = new Question(
                     "test-q" + index,
                     index,
                     "/uploads/test-q" + index + ".png",
                     "테스트 문제 " + index,
                     "테스트 해설 " + index,
                     15
-            ));
+            );
+            question.addErrorArea(new ErrorArea(0.1, 0.2, 0.3, 0.4));
+            questionRepository.save(question);
         }
     }
 
@@ -95,5 +98,13 @@ class GameControllerTests {
         mockMvc.perform(get("/api/game/questions"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(5)));
+    }
+
+    @Test
+    void questionsIncludeErrorAreasForImmediateFeedback() throws Exception {
+        mockMvc.perform(get("/api/game/questions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].errorAreas", hasSize(1)))
+                .andExpect(jsonPath("$[0].errorAreas[0].x").value(0.1));
     }
 }

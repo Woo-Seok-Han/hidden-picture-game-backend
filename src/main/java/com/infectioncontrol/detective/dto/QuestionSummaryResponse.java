@@ -5,6 +5,7 @@ public record QuestionSummaryResponse(
         int questionNumber,
         String imageUrl,
         String imageAlt,
-        int timeLimitSeconds
+        int timeLimitSeconds,
+        java.util.List<ErrorAreaDto> errorAreas
 ) {
 }
