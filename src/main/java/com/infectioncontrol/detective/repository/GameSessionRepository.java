@@ -10,5 +10,7 @@ public interface GameSessionRepository extends JpaRepository<GameSession, String
 
     Optional<GameSession> findFirstByEmployeeNumberAndStatusOrderByCompletedAtDesc(String employeeNumber, GameSessionStatus status);
 
+    boolean existsByEmployeeNumberAndStatus(String employeeNumber, GameSessionStatus status);
+
     List<GameSession> findByStatusOrderByCompletedAtDesc(GameSessionStatus status);
 }

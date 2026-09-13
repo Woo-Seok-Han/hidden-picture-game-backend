@@ -1,8 +1,11 @@
 package com.infectioncontrol.detective.controller;
 
 import static org.hamcrest.Matchers.hasSize;
+import com.infectioncontrol.detective.domain.GameSession;
 import com.infectioncontrol.detective.domain.Question;
+import com.infectioncontrol.detective.repository.GameSessionRepository;
 import com.infectioncontrol.detective.repository.QuestionRepository;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -30,8 +33,12 @@ class GameControllerTests {
     @Autowired
     private QuestionRepository questionRepository;
 
+    @Autowired
+    private GameSessionRepository gameSessionRepository;
+
     @BeforeEach
     void setUp() {
+        gameSessionRepository.deleteAll();
         questionRepository.deleteAll();
         for (int index = 1; index <= 6; index++) {
             questionRepository.save(new Question(
@@ -53,6 +60,20 @@ class GameControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.sessionId").isString())
                 .andExpect(jsonPath("$.employeeNumber").value("123456"));
+    }
+
+    @Test
+    void validateEmployeeRejectsReentry() throws Exception {
+        GameSession session = new GameSession("123456");
+        session.complete(List.of());
+        gameSessionRepository.save(session);
+
+        mockMvc.perform(post("/api/user/validate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"employeeNumber\":\"123456\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.valid").value(false))
+                .andExpect(jsonPath("$.message").value("재참여 입니다"));
     }
 
     @Test

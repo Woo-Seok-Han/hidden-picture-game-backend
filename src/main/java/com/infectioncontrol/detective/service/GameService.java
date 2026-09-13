@@ -23,6 +23,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class GameService {
 
+    private static final String REENTRY_MESSAGE = "재참여 입니다";
+
     private final GameSessionRepository gameSessionRepository;
     private final QuestionRepository questionRepository;
     private final GameResultMapper gameResultMapper;
@@ -39,11 +41,20 @@ public class GameService {
 
     @Transactional
     public GameStartResponse start(String employeeNumber) {
+        String normalizedEmployeeNumber = employeeNumber.trim();
+        if (hasCompletedGame(normalizedEmployeeNumber)) {
+            throw new IllegalArgumentException(REENTRY_MESSAGE);
+        }
         if (questionRepository.countByActiveTrue() < 5) {
             throw new IllegalArgumentException("게임을 시작하려면 활성 문제가 5개 이상 필요합니다.");
         }
-        GameSession session = gameSessionRepository.save(new GameSession(employeeNumber.trim()));
+        GameSession session = gameSessionRepository.save(new GameSession(normalizedEmployeeNumber));
         return new GameStartResponse(session.getId(), session.getEmployeeNumber(), session.getStartTime());
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public boolean hasCompletedGame(String employeeNumber) {
+        return gameSessionRepository.existsByEmployeeNumberAndStatus(employeeNumber.trim(), GameSessionStatus.COMPLETED);
     }
 
     @Transactional

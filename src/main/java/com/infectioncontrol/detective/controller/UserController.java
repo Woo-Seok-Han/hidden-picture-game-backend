@@ -24,6 +24,9 @@ public class UserController {
 
     @PostMapping("/validate")
     public EmployeeValidateResponse validate(@Valid @RequestBody EmployeeValidateRequest request) {
+        if (gameService.hasCompletedGame(request.employeeNumber())) {
+            return new EmployeeValidateResponse(false, "재참여 입니다");
+        }
         return new EmployeeValidateResponse(true, "직원이 확인되었습니다.");
     }
 
