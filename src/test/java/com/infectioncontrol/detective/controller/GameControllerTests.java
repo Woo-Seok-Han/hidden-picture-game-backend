@@ -77,6 +77,20 @@ class GameControllerTests {
     }
 
     @Test
+    void startGameAllowsReentryAfterConfirmation() throws Exception {
+        GameSession session = new GameSession("123456");
+        session.complete(List.of());
+        gameSessionRepository.save(session);
+
+        mockMvc.perform(post("/api/game/start")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"employeeNumber\":\"123456\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sessionId").isString())
+                .andExpect(jsonPath("$.employeeNumber").value("123456"));
+    }
+
+    @Test
     void questionsReturnsRandomFiveActiveQuestions() throws Exception {
         mockMvc.perform(get("/api/game/questions"))
                 .andExpect(status().isOk())
