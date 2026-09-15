@@ -68,6 +68,7 @@ public class R2StorageService implements StorageService {
                 .key(key)
                 .contentLength(file.getSize())
                 .contentType(contentType)
+                .cacheControl("public, max-age=86400")
                 .build();
 
         try {

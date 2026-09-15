@@ -1,8 +1,10 @@
 package com.infectioncontrol.detective.config;
 
 import java.nio.file.Path;
+import java.time.Duration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -30,6 +32,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         Path uploadDir = appProperties.getUploadDir().toAbsolutePath().normalize();
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations(uploadDir.toUri().toString() + "/");
+                .addResourceLocations(uploadDir.toUri() + "/")
+                .setCacheControl(CacheControl.maxAge(Duration.ofHours(24)).cachePublic());
     }
 }
